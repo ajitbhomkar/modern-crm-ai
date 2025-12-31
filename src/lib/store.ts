@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { persist, createJSONStorage } from 'zustand/middleware';
 
 export interface Customer {
   id: string;
@@ -12,6 +13,8 @@ export interface Customer {
   leadScore?: number;
   industry?: string;
   interactions: number;
+  notes?: string;
+  createdAt: Date;
 }
 
 export interface Task {
@@ -23,6 +26,8 @@ export interface Task {
   status: 'pending' | 'in-progress' | 'completed';
   assignedTo: string;
   customerId?: string;
+  createdAt: Date;
+  completedAt?: Date;
 }
 
 export interface DashboardStats {
@@ -35,10 +40,10 @@ export interface DashboardStats {
 interface CRMStore {
   customers: Customer[];
   tasks: Task[];
-  addCustomer: (customer: Customer) => void;
+  addCustomer: (customer: Omit<Customer, 'id' | 'createdAt'>) => void;
   updateCustomer: (id: string, customer: Partial<Customer>) => void;
   deleteCustomer: (id: string) => void;
-  addTask: (task: Task) => void;
+  addTask: (task: Omit<Task, 'id' | 'createdAt'>) => void;
   updateTask: (id: string, task: Partial<Task>) => void;
   deleteTask: (id: string) => void;
   getDashboardStats: () => DashboardStats;
@@ -58,6 +63,7 @@ const mockCustomers: Customer[] = [
     leadScore: 85,
     industry: 'Technology',
     interactions: 24,
+    createdAt: new Date('2024-06-15'),
   },
   {
     id: '2',
@@ -71,6 +77,7 @@ const mockCustomers: Customer[] = [
     leadScore: 72,
     industry: 'SaaS',
     interactions: 12,
+    createdAt: new Date('2024-08-20'),
   },
   {
     id: '3',
@@ -84,6 +91,7 @@ const mockCustomers: Customer[] = [
     leadScore: 92,
     industry: 'Finance',
     interactions: 38,
+    createdAt: new Date('2024-03-10'),
   },
   {
     id: '4',
@@ -97,6 +105,7 @@ const mockCustomers: Customer[] = [
     leadScore: 65,
     industry: 'Healthcare',
     interactions: 8,
+    createdAt: new Date('2024-11-05'),
   },
 ];
 
@@ -110,6 +119,7 @@ const mockTasks: Task[] = [
     status: 'pending',
     assignedTo: 'You',
     customerId: '1',
+    createdAt: new Date('2024-12-20'),
   },
   {
     id: '2',
@@ -120,6 +130,7 @@ const mockTasks: Task[] = [
     status: 'in-progress',
     assignedTo: 'You',
     customerId: '2',
+    createdAt: new Date('2024-12-22'),
   },
   {
     id: '3',
@@ -130,54 +141,75 @@ const mockTasks: Task[] = [
     status: 'pending',
     assignedTo: 'You',
     customerId: '4',
+    createdAt: new Date('2024-12-25'),
   },
 ];
 
-export const useCRMStore = create<CRMStore>((set, get) => ({
-  customers: mockCustomers,
-  tasks: mockTasks,
+export const useCRMStore = create<CRMStore>()(
+  persist(
+    (set, get) => ({
+      customers: mockCustomers,
+      tasks: mockTasks,
 
-  addCustomer: (customer) =>
-    set((state) => ({
-      customers: [...state.customers, customer],
-    })),
+      addCustomer: (customerData) => {
+        const newCustomer: Customer = {
+          ...customerData,
+          id: Date.now().toString(),
+          createdAt: new Date(),
+        };
+        set((state) => ({
+          customers: [...state.customers, newCustomer],
+        }));
+      },
 
-  updateCustomer: (id, updatedCustomer) =>
-    set((state) => ({
-      customers: state.customers.map((c) =>
-        c.id === id ? { ...c, ...updatedCustomer } : c
-      ),
-    })),
+      updateCustomer: (id, updatedCustomer) =>
+        set((state) => ({
+          customers: state.customers.map((c) =>
+            c.id === id ? { ...c, ...updatedCustomer } : c
+          ),
+        })),
 
-  deleteCustomer: (id) =>
-    set((state) => ({
-      customers: state.customers.filter((c) => c.id !== id),
-    })),
+      deleteCustomer: (id) =>
+        set((state) => ({
+          customers: state.customers.filter((c) => c.id !== id),
+        })),
 
-  addTask: (task) =>
-    set((state) => ({
-      tasks: [...state.tasks, task],
-    })),
+      addTask: (taskData) => {
+        const newTask: Task = {
+          ...taskData,
+          id: Date.now().toString(),
+          createdAt: new Date(),
+        };
+        set((state) => ({
+          tasks: [...state.tasks, newTask],
+        }));
+      },
 
-  updateTask: (id, updatedTask) =>
-    set((state) => ({
-      tasks: state.tasks.map((t) =>
-        t.id === id ? { ...t, ...updatedTask } : t
-      ),
-    })),
+      updateTask: (id, updatedTask) =>
+        set((state) => ({
+          tasks: state.tasks.map((t) =>
+            t.id === id ? { ...t, ...updatedTask } : t
+          ),
+        })),
 
-  deleteTask: (id) =>
-    set((state) => ({
-      tasks: state.tasks.filter((t) => t.id !== id),
-    })),
+      deleteTask: (id) =>
+        set((state) => ({
+          tasks: state.tasks.filter((t) => t.id !== id),
+        })),
 
-  getDashboardStats: () => {
-    const { customers, tasks } = get();
-    return {
-      totalCustomers: customers.length,
-      activeLeads: customers.filter((c) => c.status === 'lead').length,
-      totalRevenue: customers.reduce((sum, c) => sum + c.value, 0),
-      tasksCompleted: tasks.filter((t) => t.status === 'completed').length,
-    };
-  },
-}));
+      getDashboardStats: () => {
+        const { customers, tasks } = get();
+        return {
+          totalCustomers: customers.length,
+          activeLeads: customers.filter((c) => c.status === 'lead').length,
+          totalRevenue: customers.reduce((sum, c) => sum + c.value, 0),
+          tasksCompleted: tasks.filter((t) => t.status === 'completed').length,
+        };
+      },
+    }),
+    {
+      name: 'crm-storage',
+      storage: createJSONStorage(() => localStorage),
+    }
+  )
+);
