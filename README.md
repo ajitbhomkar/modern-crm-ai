@@ -1,12 +1,13 @@
-# Modern CRM System with AIThis is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Modern CRM System with AI
 
+[![CI/CD Pipeline](https://github.com/ajitbhomkar/modern-crm-ai/actions/workflows/deploy.yml/badge.svg)](https://github.com/ajitbhomkar/modern-crm-ai/actions/workflows/deploy.yml)
+![CRM Pro](https://img.shields.io/badge/Next.js-14+-black?style=flat-square&logo=next.js)
+![TypeScript](https://img.shields.io/badge/TypeScript-5+-blue?style=flat-square&logo=typescript)
+![License](https://img.shields.io/badge/license-MIT-green?style=flat-square)
 
+A modern, feature-rich Customer Relationship Management (CRM) system built with Next.js 14+, TypeScript, Tailwind CSS, and AI capabilities powered by Groq API.
 
-A modern, feature-rich Customer Relationship Management (CRM) system built with Next.js 14+, TypeScript, Tailwind CSS, and AI capabilities powered by Groq API.## Getting Started
-
-
-
-![CRM Pro](https://img.shields.io/badge/Next.js-14+-black?style=flat-square&logo=next.js)First, run the development server:
+> **🚀 Now with Automated CI/CD!** Every push automatically deploys to Vercel.
 
 ![TypeScript](https://img.shields.io/badge/TypeScript-5+-blue?style=flat-square&logo=typescript)
 
