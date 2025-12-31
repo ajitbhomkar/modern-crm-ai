@@ -12,12 +12,18 @@ import {
   Settings,
   Menu,
   X,
+  Sparkles,
+  Mail,
+  BarChart3,
+  Brain,
 } from 'lucide-react';
 
 const navigation = [
   { name: 'Dashboard', href: '/', icon: LayoutDashboard },
   { name: 'Customers', href: '/customers', icon: Users },
-  { name: 'AI Assistant', href: '/ai-chat', icon: MessageSquare },
+  { name: 'AI Insights', href: '/ai-insights', icon: Sparkles },
+  { name: 'Email Assistant', href: '/email-assistant', icon: Mail },
+  { name: 'Predictive Analytics', href: '/analytics', icon: BarChart3 },
   { name: 'Tasks', href: '/tasks', icon: CheckSquare },
   { name: 'Settings', href: '/settings', icon: Settings },
 ];
